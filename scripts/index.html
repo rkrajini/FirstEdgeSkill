@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilingual Photo Poet — Google AI Edge Gallery Skill</title>
+  <meta name="description" content="On-device Gemma multimodal AI skill transforming picture inputs into rich bilingual poetry in English and Tamil guided by Sangam, Bharathiyar, and Thirukkural references.">
+  
+  <!-- Google Fonts: Outfit, Inter, Cinzel for English Serif, Anek Tamil for Authentic Tamil Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wght@300;400;500;600;700;800&family=Cinzel:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation / App Header -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon-box">🪶</div>
+      <div class="brand-titles">
+        <h1 class="brand-title">Bilingual Photo Poet</h1>
+        <span class="brand-tamil-title">இருமொழி புகைப்பட கவிஞர் • Google AI Edge Gallery Skill</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="badge-edge-gallery" id="modelStatusBadge">
+        <span class="status-dot"></span>
+        <span>Local Gemma Model (Edge Gallery Ready)</span>
+      </div>
+
+      <button class="btn-icon" id="themeToggle" onclick="toggleTheme()" title="Switch Light/Dark Theme">☀️</button>
+      <button class="btn-sm-action" onclick="openDeployModal()" title="View Edge Gallery deployment steps">
+        <span>📲 Edge Gallery Setup</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Dual-Column Studio Workspace -->
+  <main class="main-container">
+
+    <!-- LEFT COLUMN: Image Studio, Reference Manager & Controls -->
+    <section class="controls-column">
+
+      <!-- 1. Picture Input Studio -->
+      <div class="glass-panel" id="panelImageStudio">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="icon">📷</span> Picture Input Studio
+          </div>
+          <button class="btn-sm-action" onclick="openCameraCapture()" title="Take snapshot with camera">
+            <span>📹 Webcam</span>
+          </button>
+        </div>
+
+        <!-- Drag & Drop Zone -->
+        <div class="image-dropzone" id="imageDropzone">
+          <div class="dropzone-prompt">
+            <span class="dropzone-icon">🖼️</span>
+            <div class="dropzone-title">Drop your photograph here</div>
+            <div class="dropzone-subtitle">or click to browse from device (JPG, PNG, WebP)</div>
+          </div>
+          <input type="file" id="imageFileInput" class="file-input-hidden" accept="image/*">
+        </div>
+
+        <!-- Uploaded Image Preview Box -->
+        <div class="image-preview-container" id="imagePreviewContainer">
+          <img id="imagePreviewImg" src="" alt="Selected Photograph">
+          <div class="preview-overlay">
+            <span class="preview-info" id="previewImgInfo">Photo Loaded</span>
+            <button class="btn-remove-img" onclick="removeCurrentImage()">✕ Remove</button>
+          </div>
+        </div>
+
+        <!-- Instant Preset Samples -->
+        <div class="samples-bar">
+          <div class="samples-label">Or test with preset gallery scenes:</div>
+          <div class="samples-grid" id="sampleChipsGrid">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Reference Materials Manager (Core Feature) -->
+      <div class="glass-panel" id="panelReferences">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="icon">📚</span> Reference Materials
+          </div>
+          <div class="ref-header-tools">
+            <span class="meta-pill highlight" id="activeRefsCount">2 Active</span>
+            <button class="btn-sm-action" onclick="openAddRefModal()" title="Add your own custom style reference">
+              <span>+ Add Ref</span>
+            </button>
+            <label class="btn-sm-action" style="cursor: pointer;" title="Upload Markdown or text file as reference">
+              <span>📁 Upload</span>
+              <input type="file" id="refFileInput" accept=".md,.txt" style="display: none;">
+            </label>
+          </div>
+        </div>
+
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+          Define or toggle the literary rules, classical meters, and style guides that Gemma will reference to compose the verses:
+        </p>
+
+        <!-- Dynamic Reference Cards List -->
+        <div class="ref-cards-list" id="referencesList">
+          <!-- Rendered dynamically by app.js -->
+        </div>
+      </div>
+
+      <!-- 3. Tuning & Style Options -->
+      <div class="glass-panel" id="panelTuning">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="icon">⚙️</span> Poetic Form & Aesthetics
+          </div>
+        </div>
+
+        <div class="tuning-grid">
+          <div class="form-group">
+            <label for="poeticFormSelect" class="form-label">Poetic Form / பா வகை</label>
+            <select id="poeticFormSelect" class="custom-select">
+              <option value="free_verse" selected>Modern Free Verse (புதுக்கவிதை)</option>
+              <option value="rhymed_lyrical">Rhymed Lyrical (சந்தக் கவிதை)</option>
+              <option value="couplet">Couplet / Venba (குறள் வெண்பா)</option>
+              <option value="haiku">Nature Haiku (துளிப்பா 5-7-5)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="poeticMoodSelect" class="form-label">Aesthetic Mood / சுவை (Rasa)</label>
+            <select id="poeticMoodSelect" class="custom-select">
+              <option value="Shanta" selected>Shanta / Tranquil (அமைதி)</option>
+              <option value="Vira">Vira / Heroic Fire (வீரம் & ஊக்கம்)</option>
+              <option value="Adbhuta">Adbhuta / Cosmic Wonder (வியப்பு)</option>
+              <option value="Shringara">Shringara / Love & Beauty (அன்பு)</option>
+              <option value="Karuna">Karuna / Deep Yearning (ஏக்கம்)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Optional Gemini Cloud API Key Expansion for testing live online multimodal model -->
+        <details style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+          <summary style="cursor: pointer; color: var(--text-secondary); font-weight: 500;">
+            🔑 Advanced: Test with Live Gemini API Key (Optional)
+          </summary>
+          <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+            <input type="password" id="geminiApiKeyInput" class="custom-input" placeholder="Paste Google Gemini API Key (Leave empty to use on-device Gemma engine)">
+            <span style="font-size: 11px; color: var(--text-muted);">
+              When empty, uses the local on-device Gemma Edge Gallery synthesizer.
+            </span>
+          </div>
+        </details>
+
+        <!-- Primary Generation CTA Button -->
+        <button id="btnGeneratePoem" class="btn-generate-main" onclick="generateBilingualPoem()">
+          <span>✨</span> Generate Bilingual Poem (கவிதை படைத்திடு)
+        </button>
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: Bilingual Poetry Stage & Showcase -->
+    <section class="stage-column">
+      <div class="glass-panel stage-panel" id="mainStagePanel">
+
+        <!-- A. Empty State (Before Generation) -->
+        <div class="empty-stage" id="stageEmpty">
+          <div class="empty-stage-art">📜</div>
+          <h2 class="empty-stage-title">Awaken Imagery into Dual-Language Verse</h2>
+          <p class="empty-stage-subtitle">
+            Select or upload a photograph on the left, activate your desired poetic references (Sangam, Bharathiyar, Thirukkural), and click <strong>Generate Bilingual Poem</strong>.
+          </p>
+
+          <div class="workflow-steps-pill">
+            <div class="step-chip">
+              <span class="step-num">1</span>
+              <span>Upload Photo</span>
+            </div>
+            <div class="step-chip">
+              <span class="step-num">2</span>
+              <span>Select References</span>
+            </div>
+            <div class="step-chip">
+              <span class="step-num">3</span>
+              <span>Gemma Multimodal Weave</span>
+            </div>
+            <div class="step-chip">
+              <span class="step-num">4</span>
+              <span>Recite in English & Tamil</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- B. Loading State -->
+        <div class="loading-stage" id="stageLoading">
+          <div class="poet-spinner"></div>
+          <div class="loading-text">Weaving Bilingual Verse...</div>
+          <div class="loading-subtext" id="loadingSubtext">Deconstructing visual cues and harmonizing meters...</div>
+        </div>
+
+        <!-- C. Generated Poem Stage -->
+        <div class="poem-stage-content" id="stageContent">
+
+          <!-- Poem Meta Banner -->
+          <div class="poem-header-banner">
+            <div class="poem-title-area">
+              <h2 class="poem-main-title" id="poemMainTitle">Title in English</h2>
+              <h3 class="poem-tamil-title" id="poemTamilTitle">கவிதைத் தலைப்பு</h3>
+            </div>
+            <div class="poem-meta-badges">
+              <span class="meta-pill highlight" id="poemThinaiBadge">🏞️ Kurinji</span>
+              <span class="meta-pill" id="poemMoodBadge">🎭 Shanta</span>
+              <span class="meta-pill" id="poemRefBadge">📜 Bharathiyar</span>
+            </div>
+          </div>
+
+          <!-- Bilingual Parallel Grid: English and Tamil -->
+          <div class="bilingual-grid">
+
+            <!-- English Verse Card -->
+            <div class="verse-card english">
+              <div class="verse-card-header">
+                <div class="verse-lang-label english">
+                  <span>🇬🇧</span> English Verse
+                </div>
+                <button class="btn-tts" id="btnTtsEn" onclick="reciteEnglish()" title="Listen to English poem">
+                  <span>🔊 Recite</span>
+                </button>
+              </div>
+              <div class="verse-body english" id="verseBodyEnglish">
+                <!-- Stanzas injected here -->
+              </div>
+            </div>
+
+            <!-- Tamil Verse Card (தமிழ் கவிதை) -->
+            <div class="verse-card tamil">
+              <div class="verse-card-header">
+                <div class="verse-lang-label tamil">
+                  <span>🇮🇳</span> தமிழ் கவிதை
+                </div>
+                <button class="btn-tts" id="btnTtsTa" onclick="reciteTamil()" title="Listen to Tamil poem">
+                  <span>🔊 தமிழ் வாசிப்பு</span>
+                </button>
+              </div>
+              <div class="verse-body tamil" id="verseBodyTamil">
+                <!-- Stanzas injected here -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Transliteration Option -->
+          <div style="display: flex; justify-content: flex-end;">
+            <button class="ref-btn-inspect" id="btnToggleTrans" onclick="toggleTransliteration()" style="font-size: 13px;">
+              Show Transliteration (தமிழ் உச்சரிப்பு)
+            </button>
+          </div>
+          <div class="transliteration-box" id="transliterationBox">
+            <!-- Romanized phonetics -->
+          </div>
+
+          <!-- Poetic Analysis & Meters (நயங்கள்) -->
+          <div class="poetic-analysis-card">
+            <div class="analysis-title">
+              <span>📖</span> Poetic Meters & Aesthetics Breakdown (கவிதை நயங்கள்)
+            </div>
+            <div class="analysis-grid">
+              <div class="analysis-item">
+                <div class="analysis-item-label">Monai (மோனை - Alliteration)</div>
+                <div class="analysis-item-content" id="analysisMonai">First letter alliteration match</div>
+              </div>
+              <div class="analysis-item">
+                <div class="analysis-item-label">Ethugai (எதுகை - Rhyme)</div>
+                <div class="analysis-item-content" id="analysisEthugai">Second letter vowel harmony</div>
+              </div>
+              <div class="analysis-item">
+                <div class="analysis-item-label">Visual Metaphor (உவமை)</div>
+                <div class="analysis-item-content" id="analysisMetaphor">Landscape symbolism</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Toolbar: Copy, Export, Poster Card -->
+          <div class="stage-toolbar">
+            <div class="toolbar-left">
+              <button class="btn-tool" onclick="copyPoemToClipboard()">
+                <span>📋</span> Copy Both
+              </button>
+              <button class="btn-tool" onclick="exportPoemMarkdown()">
+                <span>📄</span> Export Markdown
+              </button>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn-tool primary" onclick="downloadPoemCard()">
+                <span>🖼️</span> Download Poem Poster
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: Inspect Reference Modal -->
+  <div class="modal-backdrop" id="inspectModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="inspectModalTitle">Reference Title</h3>
+          <span style="font-size: 12px; color: var(--text-muted);" id="inspectModalAuthor">Author</span>
+        </div>
+        <button class="btn-close-modal" onclick="closeModal('inspectModal')">✕</button>
+      </div>
+      <div class="modal-body" id="inspectModalBody">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Add Custom Reference Modal -->
+  <div class="modal-backdrop" id="addRefModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Define New Reference Material</h3>
+        <button class="btn-close-modal" onclick="closeModal('addRefModal')">✕</button>
+      </div>
+      <form id="addRefForm" class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="newRefTitle">Reference Title / நூல் அல்லது கவிஞர் பெயர் *</label>
+          <input type="text" id="newRefTitle" class="custom-input" placeholder="e.g. Kannadasan Filosofical Style, Lord Byron Romanticism" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="newRefAuthor">Author / Source</label>
+            <input type="text" id="newRefAuthor" class="custom-input" placeholder="e.g. Kaviarasu Kannadasan">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newRefTag">Tag / Label</label>
+            <input type="text" id="newRefTag" class="custom-input" placeholder="e.g. Philosophical, Lyrical">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newRefSummary">Brief Summary</label>
+          <input type="text" id="newRefSummary" class="custom-input" placeholder="1-line explanation of what this style represents">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newRefGuidelines">Poetic Guidelines, Vocabulary & Rules for the Model *</label>
+          <textarea id="newRefGuidelines" class="modal-textarea" placeholder="List the specific poetic meter, tone, rhyme schemes (Ethugai/Monai), key metaphors, or vocabulary that the model should use when crafting English and Tamil poems..." required></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn-tool" onclick="closeModal('addRefModal')">Cancel</button>
+          <button type="submit" class="btn-tool primary">Save Reference</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Camera Capture Modal -->
+  <div class="modal-backdrop" id="cameraModal">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Capture Photo for Poetry</h3>
+        <button class="btn-close-modal" onclick="closeModal('cameraModal')">✕</button>
+      </div>
+      <div class="modal-body" style="align-items: center;">
+        <div id="cameraFeedContainer" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 280px; display: flex; align-items: center; justify-content: center;">
+          <!-- Video element inserted here -->
+        </div>
+        <button class="btn-generate-main" onclick="captureSnapshot()" style="margin-top: 14px;">
+          <span>📸</span> Capture Snapshot
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Edge Gallery Deployment Guide -->
+  <div class="modal-backdrop" id="deployModal">
+    <div class="modal-box" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📲 How to Add this Skill to Google AI Edge Gallery</h3>
+        <button class="btn-close-modal" onclick="closeModal('deployModal')">✕</button>
+      </div>
+      <div class="modal-body" style="font-size: 13.5px; line-height: 1.7; color: var(--text-secondary);">
+        <p><strong style="color: var(--accent-gold);">Prerequisites:</strong> Google AI Edge Gallery installed on your phone/device with your downloaded <strong>Gemma model</strong>.</p>
+        
+        <h4 style="color: var(--text-primary); margin-top: 10px;">Method A: Direct Import via Local Storage / ADB</h4>
+        <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
+          <li>Run the automated packager script in this folder:
+            <code style="background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; color: var(--accent-gold);">python package_skill.py</code>
+            (Generates <code>bilingual-photo-poet-skill.zip</code> and an unzipped folder).
+          </li>
+          <li>Push the skill folder to your Android device's Download directory via ADB or USB:
+            <pre style="background: var(--bg-surface); padding: 8px; border-radius: 6px; color: var(--accent-cyan); font-size: 12px; margin: 4px 0;">adb push bilingual-photo-poet /sdcard/Download/</pre>
+          </li>
+          <li>Open <strong>Google AI Edge Gallery</strong>, go to <strong>Agent Skills</strong> with your downloaded Gemma model.</li>
+          <li>Tap the <strong>Skills</strong> chip &rarr; Tap <strong>(+)</strong> &rarr; Select <strong>Import local skill</strong>.</li>
+          <li>Pick the folder containing <code>SKILL.md</code>. The skill is now active offline!</li>
+        </ol>
+
+        <h4 style="color: var(--text-primary); margin-top: 14px;">Method B: Load via URL / GitHub Pages</h4>
+        <p>Push this folder to a GitHub repository, enable GitHub Pages (with a <code>.nojekyll</code> file), and tap <strong>Import via URL</strong> inside the Edge Gallery app.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-notice" id="toastNotice">
+    <span>✨</span>
+    <span id="toastNoticeMsg">Notification</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="references-data.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    function openDeployModal() {
+      document.getElementById('deployModal')?.classList.add('open');
+    }
+  </script>
+</body>
+</html>
