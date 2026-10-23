@@ -79,11 +79,16 @@ FirstEdgeSkill/
    - Select the `bilingual-photo-poet` folder containing `SKILL.md`.
 4. The skill is now active offline inside your Google AI Edge Gallery app!
 
-### Option B: Load via URL / GitHub Pages
-1. Push this repository to GitHub.
-2. Ensure the `.nojekyll` file is present in the root of the published branch (included in `dist/bilingual-photo-poet/.nojekyll`).
-3. Enable GitHub Pages under **Settings &rarr; Pages**.
-4. In Google AI Edge Gallery, tap **Import via URL** and provide the link.
+### Option B: Import on iPhone or Android via URL / GitHub Pages
+The GitHub Actions workflow in `.github/workflows/deploy-pages.yml` packages the skill and publishes both the browser UI and the importable skill folder.
+
+1. Push this repository to GitHub and enable GitHub Pages under **Settings &rarr; Pages**, selecting **GitHub Actions** as the build and deployment source.
+2. Wait for the **Publish skill to GitHub Pages** workflow to finish successfully.
+3. In Google AI Edge Gallery, open **Agent Skills** with a model selected, tap **Skills** &rarr; **(+)** &rarr; **Load skill from URL**.
+4. Enter the skill folder URL: `https://rkrajini.github.io/FirstEdgeSkill/bilingual-photo-poet`
+5. If the URL is working, opening `https://rkrajini.github.io/FirstEdgeSkill/bilingual-photo-poet/SKILL.md` in Safari displays the skill instructions.
+
+Google AI Edge Gallery is available for iPhone on iOS 17 and later. This imports the skill into the Gallery app; it does not install a separate iPhone app.
 
 ---
 
