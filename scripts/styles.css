@@ -215,14 +215,20 @@ body {
   margin: 0 auto;
   padding: 24px;
   display: grid;
-  grid-template-columns: 460px 1fr;
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
   gap: 24px;
 }
 
 @media (max-width: 1080px) {
   .main-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.controls-column,
+.stage-column,
+.glass-panel {
+  min-width: 0;
 }
 
 /* Glassmorphic Cards */
@@ -372,11 +378,12 @@ body {
 
 .samples-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .sample-chip {
+  min-width: 0;
   background: var(--bg-glass);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-sm);
@@ -403,6 +410,7 @@ body {
 }
 
 .sample-name {
+  max-width: 100%;
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
@@ -592,6 +600,8 @@ input:checked + .slider:before {
 }
 
 .custom-select, .custom-input {
+  width: 100%;
+  min-width: 0;
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-glass);
   color: var(--text-primary);
@@ -1171,4 +1181,72 @@ input:checked + .slider:before {
 .toast-notice.show {
   transform: translateY(0);
   opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    position: relative;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .brand-wrapper {
+    gap: 10px;
+  }
+
+  .brand-title {
+    font-size: 18px;
+  }
+
+  .brand-tamil-title {
+    font-size: 11px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .badge-edge-gallery {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .main-container {
+    padding: 16px 12px;
+    gap: 16px;
+  }
+
+  .glass-panel {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .panel-header {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .panel-title {
+    font-size: 13px;
+  }
+
+  .ref-header-tools {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .tuning-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .toast-notice {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    justify-content: center;
+  }
 }

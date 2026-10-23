@@ -338,7 +338,9 @@ async function openCameraCapture() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     const video = document.createElement('video');
     video.srcObject = stream;
-    video.play();
+    video.autoplay = true;
+    video.muted = true;
+    video.playsInline = true;
 
     const cameraModal = document.getElementById('cameraModal');
     const cameraContainer = document.getElementById('cameraFeedContainer');
@@ -349,6 +351,7 @@ async function openCameraCapture() {
 
       window._currentCameraStream = stream;
       window._currentCameraVideo = video;
+      await video.play();
     }
   } catch (err) {
     showToast('Camera access unavailable or denied. Please upload an image.');
