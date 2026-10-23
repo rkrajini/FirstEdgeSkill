@@ -80,13 +80,14 @@ FirstEdgeSkill/
 4. The skill is now active offline inside your Google AI Edge Gallery app!
 
 ### Option B: Import on iPhone or Android via URL / GitHub Pages
-The GitHub Actions workflow in `.github/workflows/deploy-pages.yml` packages the skill and publishes both the browser UI and the importable skill folder.
+The skill files (`SKILL.md`, `references/`, and `scripts/`) are in the repository root. The root `.nojekyll` file prevents GitHub Pages from rewriting `SKILL.md`, which the Gallery must fetch directly.
 
-1. Push this repository to GitHub and enable GitHub Pages under **Settings &rarr; Pages**, selecting **GitHub Actions** as the build and deployment source.
-2. Wait for the **Publish skill to GitHub Pages** workflow to finish successfully.
-3. In Google AI Edge Gallery, open **Agent Skills** with a model selected, tap **Skills** &rarr; **(+)** &rarr; **Load skill from URL**.
-4. Enter the skill folder URL: `https://rkrajini.github.io/FirstEdgeSkill/bilingual-photo-poet`
-5. If the URL is working, opening `https://rkrajini.github.io/FirstEdgeSkill/bilingual-photo-poet/SKILL.md` in Safari displays the skill instructions.
+1. Push this repository to GitHub and wait for GitHub Pages to finish deploying.
+2. Enter the skill folder URL: `https://rkrajini.github.io/FirstEdgeSkill/`
+3. Verify that `https://rkrajini.github.io/FirstEdgeSkill/SKILL.md` displays the raw skill instructions in Safari before importing.
+4. In Google AI Edge Gallery, open **Agent Skills** with a model selected, tap **Skills** &rarr; **(+)** &rarr; **Load skill from URL**.
+
+If GitHub Pages is configured to use **GitHub Actions** instead of the repository branch, `.github/workflows/deploy-pages.yml` publishes a copy at `https://rkrajini.github.io/FirstEdgeSkill/bilingual-photo-poet/`.
 
 Google AI Edge Gallery is available for iPhone on iOS 17 and later. This imports the skill into the Gallery app; it does not install a separate iPhone app.
 
